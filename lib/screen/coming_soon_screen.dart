@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import '../common/common.dart';
+import '../common/interceptor.dart';
 import '../model/coming_soon_model.dart';
 import 'detail_screen.dart';
 
@@ -15,15 +16,17 @@ class ComingSoonScreen extends StatelessWidget {
     const path = 'https://movies-api.nomadcoders.workers.dev/coming-soon';
 
     final Dio dio = Dio();
+    dio.interceptors.add(CustomInterceptor());
+
     final response = await dio.get(path);
-    print(response.data['results']);
+    // print(response.data['results']);
 
     final json = response.data['results'];
 
     for (final ajson in json) {
       movies.add(ComingSoonModel.fromJson(ajson));
     }
-    print('MOVIES: ${movies.length}');
+    // print('MOVIES: ${movies.length}');
 
     return movies;
   }
@@ -41,7 +44,7 @@ class ComingSoonScreen extends StatelessWidget {
           FutureBuilder<List<ComingSoonModel>>(
               future: fetchData(),
               builder: (context, snapshot) {
-                print('SNAPSHOT: ${snapshot.data}');
+                // print('SNAPSHOT: ${snapshot.data}');
 
                 if (snapshot.hasData) {
                   final movies = snapshot.data!;
@@ -71,25 +74,22 @@ class ComingSoonScreen extends StatelessWidget {
                                   ),
                                 );
                               },
-                              child: Hero(
-                                tag: movies[index].id,
-                                child: Container(
-                                  // width: 140,
-                                  height: 165,
-                                  clipBehavior: Clip.hardEdge,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(15),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        blurRadius: 15,
-                                        offset: const Offset(10, 10),
-                                        color: Colors.black.withOpacity(0.3),
-                                      )
-                                    ],
-                                  ),
-                                  child: Image.network(
-                                    posterUrl,
-                                  ),
+                              child: Container(
+                                // width: 140,
+                                height: 165,
+                                clipBehavior: Clip.hardEdge,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 15,
+                                      offset: const Offset(10, 10),
+                                      color: Colors.black.withOpacity(0.3),
+                                    )
+                                  ],
+                                ),
+                                child: Image.network(
+                                  posterUrl,
                                 ),
                               ),
                             ),

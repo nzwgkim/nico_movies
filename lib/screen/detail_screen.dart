@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
+import '../common/interceptor.dart';
 import '../model/detail_movie_model.dart';
 
 class DetailScreen extends StatelessWidget {
@@ -11,6 +12,8 @@ class DetailScreen extends StatelessWidget {
 
   Future<DetailMovieModel> fetchData() async {
     final dio = Dio();
+    dio.interceptors.add(CustomInterceptor());
+
     const idUrl = 'https://movies-api.nomadcoders.workers.dev/movie';
     // print(idUrl);
     final response = await dio.get(idUrl, queryParameters: {'id': id});

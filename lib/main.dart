@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'model/popular_movies_model.dart';
 import 'screen/coming_soon_screen.dart';
 import 'screen/now_in_cinema_screen.dart';
+import 'screen/popular_movies_screen.dart';
 
 void main() {
   runApp(const App());

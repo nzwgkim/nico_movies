@@ -1,53 +1,56 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:nico_movies/common/interceptor.dart';
 
 import '../common/common.dart';
-import '../common/interceptor.dart';
-import '../model/now_movies_model.dart';
+import '../model/popular_movies_model.dart';
 import 'detail_screen.dart';
 
-class NowInCinemaScreen extends StatelessWidget {
-  const NowInCinemaScreen({
+class PopularMoviesScreen extends StatelessWidget {
+  const PopularMoviesScreen({
     super.key,
   });
 
-  Future<List<NowMoviesModel>> fetchData() async {
-    List<NowMoviesModel> movies = [];
+  Future<List<PopularMoviesModel>> fetchData() async {
+    final List<PopularMoviesModel> movies = [];
+    final dio = Dio();
 
-    final Dio dio = Dio();
     dio.interceptors.add(CustomInterceptor());
 
     final response =
-        await dio.get('https://movies-api.nomadcoders.workers.dev/now-playing');
+        await dio.get('https://movies-api.nomadcoders.workers.dev/popular');
+    // print(response.data['results']);
+    final List<dynamic> json = response.data['results'];
+    // print(json.length);
 
-    // print('Now: ${response.data['results']}');
-
-    for (final movie in response.data['results']) {
-      movies.add(NowMoviesModel.fromJson(movie));
+    for (final ajson in json) {
+      final movie = PopularMoviesModel.fromJson(ajson);
+      // print(movie.title);
+      movies.add(movie);
     }
-    // print(movies);
 
     return movies;
   }
 
   @override
   Widget build(BuildContext context) {
-    fetchData();
-
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          const SizedBox(
+            height: 10,
+          ),
           const Text(
-            'Now in Cinemas',
+            'Popular Movies',
             style: titleStyle,
           ),
-          // const SizedBox(
-          //   height: 10,
-          // ),
+          const SizedBox(
+            height: 10,
+          ),
           Expanded(
-            child: FutureBuilder<List<NowMoviesModel>>(
+            child: FutureBuilder<List<PopularMoviesModel>>(
                 future: fetchData(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
@@ -57,9 +60,10 @@ class NowInCinemaScreen extends StatelessWidget {
                   }
                   if (snapshot.hasData) {
                     // print(snapshot.data);
-                    final List<NowMoviesModel> movies = snapshot.data!;
+                    final List<PopularMoviesModel> movies = snapshot.data!;
 
                     return ListView.separated(
+                      shrinkWrap: true,
                       separatorBuilder: (context, index) => const SizedBox(
                         width: 20,
                       ),
@@ -83,30 +87,33 @@ class NowInCinemaScreen extends StatelessWidget {
                                   ),
                                 );
                               },
-                              child: Container(
-                                // width: 140,
-                                height: 165,
-                                clipBehavior: Clip.hardEdge,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      blurRadius: 15,
-                                      offset: const Offset(10, 10),
-                                      color: Colors.black.withOpacity(0.3),
-                                    )
-                                  ],
-                                ),
-                                child: Image.network(
-                                  posterUrl,
+                              child: Hero(
+                                tag: movies[index].id,
+                                child: Container(
+                                  // width: 180,
+                                  height: 165,
+                                  clipBehavior: Clip.hardEdge,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        blurRadius: 15,
+                                        offset: const Offset(10, 10),
+                                        color: Colors.black.withOpacity(0.3),
+                                      )
+                                    ],
+                                  ),
+                                  child: Image.network(
+                                    posterUrl,
+                                  ),
                                 ),
                               ),
                             ),
-                            Text(
-                              movies[index].title,
-                              style: const TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.w600),
-                            ),
+                            // Text(
+                            //   movies[index].title,
+                            //   style: const TextStyle(
+                            //       fontSize: 14, fontWeight: FontWeight.w600),
+                            // ),
                           ],
                         );
                       },
