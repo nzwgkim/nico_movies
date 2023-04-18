@@ -1,21 +1,19 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../common/common.dart';
-import '../common/interceptor.dart';
 import '../model/now_movies_model.dart';
 import 'detail_screen.dart';
 
-class NowInCinemaScreen extends StatelessWidget {
+class NowInCinemaScreen extends ConsumerWidget {
   const NowInCinemaScreen({
     super.key,
   });
 
-  Future<List<NowMoviesModel>> fetchData() async {
+  Future<List<NowMoviesModel>> fetchData(WidgetRef ref) async {
     List<NowMoviesModel> movies = [];
 
-    final Dio dio = Dio();
-    dio.interceptors.add(CustomInterceptor());
+    final dio = ref.watch(dioProvider);
 
     final response =
         await dio.get('https://movies-api.nomadcoders.workers.dev/now-playing');
@@ -31,9 +29,7 @@ class NowInCinemaScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    fetchData();
-
+  Widget build(BuildContext context, WidgetRef ref) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,7 +44,7 @@ class NowInCinemaScreen extends StatelessWidget {
           // ),
           Expanded(
             child: FutureBuilder<List<NowMoviesModel>>(
-                future: fetchData(),
+                future: fetchData(ref),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return const Center(

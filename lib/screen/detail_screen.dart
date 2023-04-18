@@ -1,18 +1,17 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../common/interceptor.dart';
+import '../common/common.dart';
 import '../model/detail_movie_model.dart';
 
-class DetailScreen extends StatelessWidget {
+class DetailScreen extends ConsumerWidget {
   final int id;
   final String posterUrl;
 
   const DetailScreen({super.key, required this.id, required this.posterUrl});
 
-  Future<DetailMovieModel> fetchData() async {
-    final dio = Dio();
-    dio.interceptors.add(CustomInterceptor());
+  Future<DetailMovieModel> fetchData(WidgetRef ref) async {
+    final dio = ref.watch(dioProvider);
 
     const idUrl = 'https://movies-api.nomadcoders.workers.dev/movie';
     // print(idUrl);
@@ -25,7 +24,7 @@ class DetailScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     const TextStyle style =
         TextStyle(fontSize: 16, fontWeight: FontWeight.w600);
     // print(id.toString());
@@ -34,7 +33,7 @@ class DetailScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: FutureBuilder<DetailMovieModel>(
-          future: fetchData(),
+          future: fetchData(ref),
           builder: (context, snapshot) {
             // print('1-- ${snapshot.data}');
 

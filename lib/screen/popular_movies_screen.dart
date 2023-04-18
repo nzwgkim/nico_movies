@@ -1,21 +1,20 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:nico_movies/common/interceptor.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../common/common.dart';
 import '../model/popular_movies_model.dart';
 import 'detail_screen.dart';
 
-class PopularMoviesScreen extends StatelessWidget {
+class PopularMoviesScreen extends ConsumerWidget {
   const PopularMoviesScreen({
     super.key,
   });
 
-  Future<List<PopularMoviesModel>> fetchData() async {
+  Future<List<PopularMoviesModel>> fetchData(WidgetRef ref) async {
     final List<PopularMoviesModel> movies = [];
-    final dio = Dio();
+    // final dio = Dio();
 
-    dio.interceptors.add(CustomInterceptor());
+    final dio = ref.watch(dioProvider);
 
     final response =
         await dio.get('https://movies-api.nomadcoders.workers.dev/popular');
@@ -33,7 +32,7 @@ class PopularMoviesScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,7 +50,7 @@ class PopularMoviesScreen extends StatelessWidget {
           ),
           Expanded(
             child: FutureBuilder<List<PopularMoviesModel>>(
-                future: fetchData(),
+                future: fetchData(ref),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return const Center(

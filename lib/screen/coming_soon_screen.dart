@@ -1,22 +1,20 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../common/common.dart';
-import '../common/interceptor.dart';
 import '../model/coming_soon_model.dart';
 import 'detail_screen.dart';
 
-class ComingSoonScreen extends StatelessWidget {
+class ComingSoonScreen extends ConsumerWidget {
   const ComingSoonScreen({
     super.key,
   });
 
-  Future<List<ComingSoonModel>> fetchData() async {
+  Future<List<ComingSoonModel>> fetchData(WidgetRef ref) async {
     List<ComingSoonModel> movies = [];
     const path = 'https://movies-api.nomadcoders.workers.dev/coming-soon';
 
-    final Dio dio = Dio();
-    dio.interceptors.add(CustomInterceptor());
+    final dio = ref.watch(dioProvider);
 
     final response = await dio.get(path);
     // print(response.data['results']);
@@ -32,7 +30,7 @@ class ComingSoonScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,7 +40,7 @@ class ComingSoonScreen extends StatelessWidget {
             style: titleStyle,
           ),
           FutureBuilder<List<ComingSoonModel>>(
-              future: fetchData(),
+              future: fetchData(ref),
               builder: (context, snapshot) {
                 // print('SNAPSHOT: ${snapshot.data}');
 
